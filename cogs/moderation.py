@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import asyncio
 
 import time
 import datetime
@@ -35,7 +36,7 @@ class Moderation(commands.Cog):
 
             embeds = []
             if vote:
-                embed = discord.Embed(title="Vote info", description=f"{user} has voted for {vote['candidate']}", color=0x00ff00)
+                embed = discord.Embed(title="Vote info", description=f"{user} has voted for <@{vote['vote']}> ({vote['vote']})", color=0x00ff00)
                 embeds.append(embed)
 
             if candidate:
@@ -50,7 +51,7 @@ class Moderation(commands.Cog):
                     if i == 25:
                         embed.add_field(name="too much data for discord to show", value="\u200b")
                         break
-                    embed.add_field(name=i, value=p['date'])
+                    embed.add_field(name=f"id: {i}", value=p['date'])
                 embeds.append(embed)
 
             if len(embeds) > 0:
@@ -69,7 +70,10 @@ class Moderation(commands.Cog):
             votecount = {}
             total = 0
             for candidate in candidates:
-                votecount[candidate['uid']] = await con.fetchval("SELECT COUNT(*) FROM votes WHERE candidate = $1", candidate['uid'])
+                m = await ctx.guild.fetch_member(candidate['uid'])
+                if m is None:
+                    continue
+                votecount[candidate['uid']] = await con.fetchval("SELECT COUNT(*) FROM votes WHERE vote = $1", candidate['uid'])
                 total += votecount[candidate['uid']]
 
             winner = max(votecount, key=votecount.get)
@@ -77,7 +81,11 @@ class Moderation(commands.Cog):
             message = await ctx.send(f"The winner is <@{winner}> ({winner}) with {votecount[winner]} votes. Do you wish to elect them?")
             await message.add_reaction("✅")
             await message.add_reaction("❌")
-            r, _ = await self.bot.wait_for("reaction_add", check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id and r.emoji in ["✅", "❌"])
+            try:
+                r, _ = await self.bot.wait_for("reaction_add", check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id and r.emoji in ["✅", "❌"], timeout=60)
+            except asyncio.TimeoutError:
+                await message.delete()
+                return
             if r.emoji == "✅":
                 await con.execute("INSERT INTO presidents (uid, date) VALUES ($1, $2)", winner, datetime.datetime.utcnow())
                 await con.execute("DELETE FROM candidates")

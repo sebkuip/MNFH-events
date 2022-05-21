@@ -13,6 +13,7 @@ activity = discord.Activity(type=discord.ActivityType.custom, name=f"> | Tallyin
 bot = commands.Bot(intents=discord.Intents.all(), command_prefix=">", case_insensitive=True, activity=activity)
 bot.channel = getenv("CHANNEL")
 bot.staff_channel = getenv("STAFF_CHANNEL")
+bot.role = getenv("ROLE")
 
 @bot.event
 async def on_ready():

@@ -22,7 +22,7 @@ class Elections(commands.Cog):
                 c = await self.bot.fetch_channel(self.bot.staff_channel)
                 m = await c.fetch_message(payload.message_id)
                 if m:
-                    await m.edit(content=f"<@{data['uid']}> ({data['uid']}) has been rejected by. <@{payload.user_id}> ({payload.user_id})", embed=m.embeds[0])
+                    await m.edit(content=f"<@{data['uid']}> ({data['uid']}) has been rejected by <@{payload.user_id}> ({payload.user_id})", embed=m.embeds[0])
                     await m.clear_reactions()
                 await con.execute("DELETE FROM candidates WHERE verification_message = $1", payload.message_id)
                 member = await self.bot.fetch_user(data["uid"])
@@ -36,7 +36,7 @@ class Elections(commands.Cog):
                 c = await self.bot.fetch_channel(self.bot.staff_channel)
                 m = await c.fetch_message(payload.message_id)
                 if m:
-                    await m.edit(content=f"<@{data['uid']}> ({data['uid']}) has been accepted by. <@{payload.user_id}> ({payload.user_id})", embed=m.embeds[0])
+                    await m.edit(content=f"<@{data['uid']}> ({data['uid']}) has been accepted by <@{payload.user_id}> ({payload.user_id})", embed=m.embeds[0])
                     await m.clear_reactions()
                 await con.execute("UPDATE candidates SET verified = true WHERE verification_message = $1", payload.message_id)
                 member = await self.bot.fetch_user(data["uid"])

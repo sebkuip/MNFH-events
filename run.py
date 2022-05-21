@@ -67,7 +67,7 @@ async def load_extensions():
             print(f" {extension.ljust(maxlen)} | {status[extension]}")
         print(errors) if errors else print("no errors during loading")
 
-@bot.command()
+@bot.command(help="Load a cog")
 @commands.is_owner()
 async def load(ctx, extension):
     await ctx.send(f"loading cog {extension}")
@@ -81,7 +81,7 @@ async def load(ctx, extension):
         print(e)
 
 
-@bot.command()
+@bot.command(help="Unload a cog")
 @commands.is_owner()
 async def unload(ctx, extension):
     await ctx.send(f"unloading cog {extension}")

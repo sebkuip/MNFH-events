@@ -13,7 +13,7 @@ class Moderation(commands.Cog):
     @commands.command(help="Shows the latency the bot is experiencing")
     async def ping(self, ctx):
         before = time.perf_counter()
-        msg = await ctx.send("testing...")
+        msg = await ctx.reply("testing...", mention_author=False)
         await msg.edit(content=f"pong!\nbot latency: {round((time.perf_counter() - before) * 1000)}ms\nwebsocket latency: {round(self.bot.latency * 1000)}ms")
 
     @commands.command(help="Send a message as the bot")
@@ -55,9 +55,9 @@ class Moderation(commands.Cog):
                 embeds.append(embed)
 
             if len(embeds) > 0:
-                await ctx.send(embed=embeds[0])
+                await ctx.reply(embed=embeds[0], mention_author=False)
             else:
-                await ctx.send("User has no info")
+                await ctx.reply("User has no info", mention_author=False)
 
     @commands.command(help="End an election, tally votes and announce the winner")
     @commands.has_permissions(manage_messages=True)
@@ -65,7 +65,7 @@ class Moderation(commands.Cog):
         async with self.bot.pool.acquire() as con:
             candidates = await con.fetch("SELECT * FROM candidates")
             if candidates is None or len(candidates) == 0:
-                await ctx.send("No candidates to tally")
+                await ctx.reply("No candidates to tally", mention_author=False)
                 return
             votecount = {}
             total = 0
@@ -78,7 +78,7 @@ class Moderation(commands.Cog):
 
             winner = max(votecount, key=votecount.get)
 
-            message = await ctx.send(f"The winner is <@{winner}> ({winner}) with {votecount[winner]} votes. Do you wish to elect them?")
+            message = await ctx.reply(f"The winner is <@{winner}> ({winner}) with {votecount[winner]} votes. Do you wish to elect them?", mention_author=False)
             await message.add_reaction("✅")
             await message.add_reaction("❌")
             try:
@@ -93,13 +93,13 @@ class Moderation(commands.Cog):
                 c = await self.bot.fetch_channel(self.bot.channel)
                 await c.send(f"<@{winner}> has been elected president with {round(votecount[winner] / total * 100, 2)}% of the votes")
             elif r.emoji == "❌":
-                await ctx.send("Tally cancelled")
+                await ctx.reply("Tally cancelled", mention_author=False)
                 return
 
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
     async def remove(self, ctx):
-        await ctx.send("Please specify a sub-command to remove")
+        await ctx.reply("Please specify a sub-command to remove", mention_author=False)
 
     @remove.command(help="Remove a candidate")
     @commands.has_permissions(manage_messages=True)
@@ -108,9 +108,9 @@ class Moderation(commands.Cog):
             uid = await con.fetchrow("DELETE FROM candidates WHERE uid = $1 RETURNING uid", user.id)
             if uid:
                 await con.execute("DELETE FROM votes WHERE vote = $1", user.id)
-                await ctx.send("Removed candidate")
+                await ctx.reply("Removed candidate", mention_author=False)
             else:
-                await ctx.send("Candidate not found")
+                await ctx.reply("Candidate not found", mention_author=False)
 
     @remove.command(help="Remove a vote from a specific user")
     @commands.has_permissions(manage_messages=True)
@@ -118,9 +118,9 @@ class Moderation(commands.Cog):
         async with self.bot.pool.acquire() as con:
             uid = await con.fetchrow("DELETE FROM votes WHERE uid = $1 RETURNING uid", user.id)
             if uid:
-                await ctx.send("Removed vote")
+                await ctx.reply("Removed vote", mention_author=False)
             else:
-                await ctx.send("Vote not found")
+                await ctx.reply("Vote not found", mention_author=False)
 
 
 async def setup(bot):

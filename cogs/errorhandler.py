@@ -75,7 +75,7 @@ class ErrorHandler(commands.Cog):
                 name=f"**UnknownError**",
                 value=f"An unknown error has appeared, check console",
             )
-            traceback.print_exception(error)
+            traceback.print_tb(error.__traceback__)
 
         await ctx.send(embed=embed)
 

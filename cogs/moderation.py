@@ -59,7 +59,7 @@ class Moderation(commands.Cog):
             else:
                 await ctx.reply("User has no info", mention_author=False)
 
-    @commands.command(help="End an election, tally votes and announce the winner")
+    @commands.group(help="End an election, tally votes and announce the winner", invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
     async def tally(self, ctx):
         async with self.bot.pool.acquire() as con:
@@ -74,6 +74,7 @@ class Moderation(commands.Cog):
                 if m is None:
                     continue
                 votecount[candidate['uid']] = await con.fetchval("SELECT COUNT(*) FROM votes WHERE vote = $1", candidate['uid'])
+                votecount[candidate['uid']] += candidate['misc_votes']
                 total += votecount[candidate['uid']]
 
             winner = max(votecount, key=votecount.get)
@@ -99,6 +100,34 @@ class Moderation(commands.Cog):
             elif r.emoji == "❌":
                 await ctx.reply("Tally cancelled", mention_author=False)
                 return
+
+    @tally.command(help="Get a list of all candidates and their votes")
+    @commands.has_permissions(manage_messages=True)
+    async def list(self, ctx):
+        msg = await ctx.reply("Counting votes...", mention_author=False)
+        async with ctx.typing():
+            async with self.bot.pool.acquire() as con:
+                candidates = await con.fetch("SELECT * FROM candidates")
+                if candidates is None or len(candidates) == 0:
+                    await ctx.reply("No candidates to tally", mention_author=False)
+                    return
+                votecount = {}
+                total = 0
+                for candidate in candidates:
+                    m = await ctx.guild.fetch_member(candidate['uid'])
+                    if m is None:
+                        continue
+                    votecount[candidate['uid']] = await con.fetchval("SELECT COUNT(*) FROM votes WHERE vote = $1", candidate['uid'])
+                    votecount[candidate['uid']] += candidate['misc_votes']
+                    total += votecount[candidate['uid']]
+
+                body = ""
+                i = 1
+                for k, v in sorted(votecount.items(), key=lambda item: item[1], reverse=True):
+                    body += f"{i}. <@{k}> ({k}) - {v} votes\n"
+                    i+=1
+                embed = discord.Embed(title="Candidates", description=body, color=0x00ff00)
+                await msg.edit(content="", embed=embed, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)

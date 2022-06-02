@@ -114,8 +114,9 @@ class Moderation(commands.Cog):
                 votecount = {}
                 total = 0
                 for candidate in candidates:
-                    m = await ctx.guild.fetch_member(candidate['uid'])
-                    if m is None:
+                    try:
+                        m = await ctx.guild.fetch_member(candidate['uid'])
+                    except discord.NotFound:
                         continue
                     votecount[candidate['uid']] = await con.fetchval("SELECT COUNT(*) FROM votes WHERE vote = $1", candidate['uid'])
                     votecount[candidate['uid']] += candidate['misc_votes']

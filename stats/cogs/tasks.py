@@ -13,7 +13,8 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=1)
     async def print_stats(self):
-        print("printing stats")
+        async with self.bot.stats_lock:
+            print("printing stats")
 
     @tasks.loop(minutes=10)
     async def upload_stats(self):

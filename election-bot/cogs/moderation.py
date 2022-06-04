@@ -93,9 +93,8 @@ class Moderation(commands.Cog):
                 await con.execute("DELETE FROM votes")
                 c = await self.bot.fetch_channel(self.bot.channel)
                 m = await ctx.guild.fetch_member(winner)
-                r = await ctx.guild.fetch_role(self.bot.role)
+                r = ctx.guild.get_role(self.bot.role)
                 await m.add_roles(r)
-                await winner.add_role()
                 await c.send(f"<@{winner}> has been elected president with {round(votecount[winner] / total * 100, 2)}% of the votes")
             elif r.emoji == "❌":
                 await ctx.reply("Tally cancelled", mention_author=False)

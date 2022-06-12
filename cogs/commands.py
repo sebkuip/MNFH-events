@@ -35,5 +35,11 @@ class Commands(commands.Cog):
             await member.add_roles(role)
             await ctx.reply(f"Added {role.name} to {member.mention} ({member.id})", mention_author=False)
 
+    @commands.command(help="Change the bot's activity")
+    @commands.has_permissions(manage_messages=True)
+    async def activity(self, ctx, *, activity: str):
+        await self.bot.change_presence(activity=discord.CustomActivity(activity))
+        await ctx.reply(f"Activity changed to {activity}")
+
 async def setup(bot):
     await bot.add_cog(Commands(bot))

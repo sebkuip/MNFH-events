@@ -10,22 +10,6 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(help="Shows the latency the bot is experiencing")
-    async def ping(self, ctx):
-        before = time.perf_counter()
-        msg = await ctx.reply("testing...", mention_author=False)
-        await msg.edit(content=f"pong!\nbot latency: {round((time.perf_counter() - before) * 1000)}ms\nwebsocket latency: {round(self.bot.latency * 1000)}ms")
-
-    @commands.command(help="Send a message as the bot")
-    @commands.has_permissions(manage_messages=True)
-    async def echo(
-        self, ctx, channel: typing.Optional[discord.TextChannel] = None, *, text
-    ):
-        if channel is None:
-            channel = ctx.channel
-        await channel.send(text)
-        await ctx.message.delete()
-
     @commands.command(help="Get info for a user")
     @commands.has_permissions(manage_messages=True)
     async def info(self, ctx, user: discord.User):

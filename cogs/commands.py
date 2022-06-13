@@ -44,7 +44,7 @@ class Commands(commands.Cog):
 
     @commands.command(help="Roll the dice", aliases=["rtd", "rollthedice"])
     async def dice(self, ctx, *, dice: typing.Optional[str] = None):
-        if "d" in dice:
+        if dice and "d" in dice:
             dice = dice.split("d")
             if len(dice) == 2:
                 dice[0] = int(dice[0])

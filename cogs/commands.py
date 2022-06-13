@@ -1,9 +1,10 @@
+from ast import alias
 import discord
 from discord.ext import commands
 
 import typing
 import time
-import asyncio
+import random
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -40,6 +41,28 @@ class Commands(commands.Cog):
     async def activity(self, ctx, *, activity: str):
         await self.bot.change_presence(activity=discord.CustomActivity(activity))
         await ctx.reply(f"Activity changed to {activity}")
+
+    @commands.command(help="Roll the dice", aliases=["rtd", "rollthedice"])
+    async def dice(self, ctx, *, dice: typing.Optional[str] = None):
+        if "d" in dice:
+            dice = dice.split("d")
+            if len(dice) == 2:
+                dice[0] = int(dice[0])
+                dice[1] = int(dice[1])
+                if dice[0] > 0 and dice[1] > 0:
+                    result = 0
+                    for _ in range(dice[0]):
+                        result += random.randint(1, dice[1])
+                    await ctx.reply(f"You rolled {dice[0]}d{dice[1]} and got {result}")
+            else:
+                await ctx.reply("Invalid dice format")
+        elif dice is not None:
+            try:
+                await ctx.reply(f"You rolled {random.randint(1, int(dice))}")
+            except ValueError:
+                await ctx.reply("Invalid dice format")
+        else:
+            await ctx.reply(f"You rolled {random.randint(1, 6)}")
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))

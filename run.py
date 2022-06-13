@@ -67,7 +67,87 @@ async def load_extensions():
         for extension in status:
             print(f" {extension.ljust(maxlen)} | {status[extension]}")
         print(errors) if errors else print("no errors during loading")
+        print("loading p-loaded extensions")
+        async with bot.pool.acquire() as con:
+            groups = await con.fetch("SELECT * FROM pload")
+            if len(groups) == 0:
+                print("No p-loaded extensions")
+            else:
+                status = {}
+                for group in groups:
+                    for extension in os.listdir(f"./{group['name']}"):
+                        if extension.endswith(".py"):
+                            status[group['name'] + "." + extension] = "X"
+                errors = []
+                for extension in status:
+                    try:
+                        await bot.load_extension(f"{extension[:-3]}")
+                        status[extension] = "L"
+                    except Exception as e:
+                        errors.append(e)
+                maxlen = max(len(str(extension)) for extension in status)
+                for extension in status:
+                    print(f" {extension.ljust(maxlen)} | {status[extension]}")
+                print(errors) if errors else print("no errors during loading")
         await bot.load_extension('jishaku')
+
+@bot.command(help="Perma load a cog group")
+@commands.is_owner()
+async def pload(ctx, name):
+    name = name.lower()
+    async with bot.pool.acquire() as con:
+        await con.execute("INSERT INTO pload (name) VALUES ($1) ON CONFLICT (name) DO NOTHING", name)
+    status = {}
+    for extension in os.listdir(f"./{name}"):
+        if extension.endswith(".py"):
+            status[extension] = "X"
+    errors = []
+
+    for extension in status:
+        if extension.endswith(".py"):
+            try:
+                await bot.load_extension(f"{name}.{extension[:-3]}")
+                status[extension] = "L"
+            except Exception as e:
+                errors.append(e)
+
+    maxlen = max(len(str(extension)) for extension in status)
+    extensionstatus = ""
+    for extension in status:
+        extensionstatus += (f" {extension.ljust(maxlen)} | {status[extension]}\n")
+    embed = discord.Embed(title=f"load report of {name}", description=extensionstatus, color=0x00ff00 if not errors else 0xFF0000)
+    if errors:
+        embed.add_field(name="Errors", value=str(errors))
+    await ctx.send(embed=embed)
+
+@bot.command(help="Perma unload a cog group")
+@commands.is_owner()
+async def punload(ctx, name):
+    name = name.lower()
+    async with bot.pool.acquire() as con:
+        await con.execute("DELETE FROM pload WHERE name = $1", name)
+    status = {}
+    for extension in os.listdir(f"./{name}"):
+        if extension.endswith(".py"):
+            status[extension] = "X"
+    errors = []
+
+    for extension in status:
+        if extension.endswith(".py"):
+            try:
+                await bot.unload_extension(f"{name}.{extension[:-3]}")
+                status[extension] = "U"
+            except Exception as e:
+                errors.append(e)
+
+    maxlen = max(len(str(extension)) for extension in status)
+    extensionstatus = ""
+    for extension in status:
+        extensionstatus += (f" {extension.ljust(maxlen)} | {status[extension]}\n")
+    embed = discord.Embed(title=f"Unload report of {name}", description=extensionstatus, color=0x00ff00 if not errors else 0xFF0000)
+    if errors:
+        embed.add_field(name="Errors", value=str(errors))
+    await ctx.send(embed=embed)
 
 @bot.command(help="Load a cog")
 @commands.is_owner()

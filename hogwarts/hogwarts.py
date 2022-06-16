@@ -78,9 +78,11 @@ class Hogwarts(commands.Cog):
             chunks = chunker(users, len(houses))
             for house, users in zip(houses, chunks):
                 for user in users:
-                    await conn.execute("UPDATE users SET house = $1 WHERE uid = $2", house, user["uid"])
-                    m = ctx.guild.get_member(user["uid"]) or await self.bot.fetch_user(user["uid"])
+                    m = ctx.guild.get_member(user["uid"]) or await ctx.guild.fetch_user(user["uid"])
+                    if m is None:
+                        continue
                     await m.add_roles(self.houses[house])
+                    await conn.execute("UPDATE users SET house = $1 WHERE uid = $2", house, user["uid"])
         await ctx.reply("All users assigned")
 
     @commands.group(help="See info about a house or user", invoke_without_command=True)

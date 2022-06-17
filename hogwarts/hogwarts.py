@@ -78,7 +78,7 @@ class Hogwarts(commands.Cog):
             chunks = chunker(users, len(houses))
             for house, users in zip(houses, chunks):
                 for user in users:
-                    m = ctx.guild.get_member(user["uid"]) or await ctx.guild.fetch_user(user["uid"])
+                    m = ctx.guild.get_member(user["uid"]) or await ctx.guild.fetch_member(user["uid"])
                     if m is None:
                         continue
                     await m.add_roles(self.houses[house])

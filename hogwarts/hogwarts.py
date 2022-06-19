@@ -20,6 +20,11 @@ class Hogwarts(commands.Cog):
         g = self.bot.get_guild(685715989891121152) or await self.bot.fetch_guild(685715989891121152)
         self.houses = {"gryffindor": discord.utils.get(g.roles, id=985930365560586240), "hufflepuff": discord.utils.get(g.roles, id=985930526215000114), "ravenclaw": discord.utils.get(g.roles, id=985930572377522286), "slytherin": discord.utils.get(g.roles, id=985930608066822184)}
 
+    @commands.Cog.listener()
+    async def on_raw_member_remove(self, payload):
+        async with self.bot.db.acquire() as con:
+            await con.execute("UPDATE users SET active = false WHERE uid = $1", payload.user.id)
+
     @commands.command(help="Assign a candidate to a house or reinstate them")
     @commands.has_permissions(manage_messages=True)
     async def assign(self, ctx, user: discord.User, house: typing.Optional[str] = None):

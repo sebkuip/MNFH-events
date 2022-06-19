@@ -136,10 +136,10 @@ class Hogwarts(commands.Cog):
                 if house in channel.name:
                     c = channel
                     break
-            if c is None:
-                await ctx.reply(f"{house} has been awarded {points} points" + (f" for {reason}" if reason is not None else ""))
-            else:
+            if c is not None:
                 await c.send(f"{house} has awarded {points} points" + (f" for {reason}" if reason is not None else ""))
+
+        await ctx.reply(f"{house} has been awarded {points} points" + (f" for {reason}" if reason is not None else "") + (f" silently" if silent else ""))
 
     @commands.command(help="Join the hogwarts event")
     async def reply(self, ctx):

@@ -165,6 +165,7 @@ class Hogwarts(commands.Cog):
 
             if str(reaction.emoji) == "✅":
                 await conn.execute("UPDATE users SET active = false WHERE uid = $1", ctx.author.id)
+                await ctx.author.remove_roles(*[self.houses[h] for h in self.houses if self.houses[h] in ctx.author.roles])
                 await msg.delete()
                 await ctx.reply("You have left the hogwarts event")
             else:

@@ -20,6 +20,11 @@ class Hogwarts(commands.Cog):
         g = self.bot.get_guild(685715989891121152) or await self.bot.fetch_guild(685715989891121152)
         self.houses = {"gryffindor": discord.utils.get(g.roles, id=985930365560586240), "hufflepuff": discord.utils.get(g.roles, id=985930526215000114), "ravenclaw": discord.utils.get(g.roles, id=985930572377522286), "slytherin": discord.utils.get(g.roles, id=985930608066822184)}
 
+    @commands.Cog.listener()
+    async def on_raw_member_remove(self, payload):
+        async with self.bot.db.acquire() as con:
+            await con.execute("UPDATE users SET active = false WHERE uid = $1", payload.user.id)
+
     @commands.command(help="Assign a candidate to a house or reinstate them")
     @commands.has_permissions(manage_messages=True)
     async def assign(self, ctx, user: discord.User, house: typing.Optional[str] = None):
@@ -78,7 +83,10 @@ class Hogwarts(commands.Cog):
             chunks = chunker(users, len(houses))
             for house, users in zip(houses, chunks):
                 for user in users:
-                    m = ctx.guild.get_member(user["uid"]) or await ctx.guild.fetch_user(user["uid"])
+                    try:
+                        m = ctx.guild.get_member(user["uid"]) or await ctx.guild.fetch_member(user["uid"])
+                    except discord.NotFound:
+                        continue
                     if m is None:
                         continue
                     await m.add_roles(self.houses[house])
@@ -128,10 +136,10 @@ class Hogwarts(commands.Cog):
                 if house in channel.name:
                     c = channel
                     break
-            if c is None:
-                await ctx.reply(f"{house} has been awarded {points} points" + (f" for {reason}" if reason is not None else ""))
-            else:
+            if c is not None:
                 await c.send(f"{house} has awarded {points} points" + (f" for {reason}" if reason is not None else ""))
+
+        await ctx.reply(f"{house} has been awarded {points} points" + (f" for {reason}" if reason is not None else "") + (f" silently" if silent else ""))
 
     @commands.command(help="Join the hogwarts event")
     async def reply(self, ctx):

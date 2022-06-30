@@ -64,5 +64,19 @@ class Commands(commands.Cog):
         else:
             await ctx.reply(f"You rolled {random.randint(1, 6)}")
 
+    @commands.command(help="Invite users to participate in a game or event")
+    @commands.has_permissions(manage_messages=True)
+    async def invite(self, ctx, channel: typing.Optional[discord.TextChannel] = None, roles: commands.Greedy[discord.Role] = [], *, text: typing.Optional[str] = None):
+        channel = channel if channel else ctx.channel
+        rolestring = "".join([role.mention for role in roles])
+        content = f"Hey {rolestring}, " if rolestring != "" else "Hey all, "
+        content += f"{ctx.author.mention} has invited you to join an event or game!"
+        if text:
+            embed = discord.Embed(description=text, color=discord.Color.blurple())
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar.url)
+            await channel.send(content, embed=embed)
+        else:
+            await channel.send(content)
+
 async def setup(bot):
     await bot.add_cog(Commands(bot))

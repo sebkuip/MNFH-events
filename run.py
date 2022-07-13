@@ -31,7 +31,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(m):
-    if m.author.bot or m.content.startswith(">:"):
+    if m.author.bot or m.content.startswith(">:") or m.content.startswith(">;"):
         return
     await bot.process_commands(m)
 

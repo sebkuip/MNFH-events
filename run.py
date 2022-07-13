@@ -29,6 +29,11 @@ async def on_ready():
     # extensions
     await load_extensions()
 
+@bot.event
+async def on_message(m):
+    if m.author.bot or m.content.startswith(">:"):
+        return
+    await bot.process_commands(m)
 
 async def get_db():
     HOST=getenv("HOST")

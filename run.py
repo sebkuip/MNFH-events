@@ -9,8 +9,8 @@ from os import getenv
 load_dotenv(".env")
 token = getenv("TOKEN")
 
-activity = discord.Activity(type=discord.ActivityType.custom, name=f"> | Running events")
-bot = commands.Bot(intents=discord.Intents.all(), command_prefix=">", case_insensitive=True, activity=activity)
+activity = discord.Activity(type=discord.ActivityType.custom, name=f"& | Running events")
+bot = commands.Bot(intents=discord.Intents.all(), command_prefix="&", case_insensitive=True, activity=activity)
 bot.channel = getenv("CHANNEL")
 bot.staff_channel = getenv("STAFF_CHANNEL")
 bot.role = getenv("ROLE")
@@ -28,12 +28,6 @@ async def on_ready():
 
     # extensions
     await load_extensions()
-
-@bot.event
-async def on_message(m):
-    if m.author.bot or m.content.startswith(">:") or m.content.startswith(">;"):
-        return
-    await bot.process_commands(m)
 
 async def get_db():
     HOST=getenv("HOST")

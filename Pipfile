@@ -8,6 +8,6 @@ run = "python run.py"
 
 [packages]
 asyncpg = "*"
-"discord.py" = {ref = "7905d63f7c988640a0848cb2a26c8dc3c3eaa862", git = "https://github.com/Rapptz/discord.py.git"}
+"discord.py" = "2.0.1"
 python-dotenv = "*"
 jishaku = "*"

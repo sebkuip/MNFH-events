@@ -8,10 +8,15 @@ from os import getenv
 
 load_dotenv(".env")
 token = getenv("TOKEN")
+guild_id = getenv("GUILD")
 
-activity = discord.Activity(type=discord.ActivityType.custom, name=f"& | Running events")
-bot = commands.Bot(intents=discord.Intents.all(), command_prefix="&", case_insensitive=True, activity=activity)
-bot.channel = getenv("CHANNEL")
+class MyBot(commands.Bot):
+    def __init__(self):
+        activity = discord.Activity(type=discord.ActivityType.custom, name=f"& | Running events")
+        self.guild_id = guild_id
+        super().__init__(intents=discord.Intents.all(), command_prefix="&", case_insensitive=True, activity=activity)
+
+bot = MyBot()
 bot.staff_channel = getenv("STAFF_CHANNEL")
 bot.role = getenv("ROLE")
 

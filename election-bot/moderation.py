@@ -24,8 +24,8 @@ class Moderation(commands.Cog):
                 embeds.append(embed)
 
             if candidate:
-                embed = discord.Embed(title="Candidate info", description=f"{user} is running for office", color=0x00ff00)
-                embed.add_field(name="fist person", value=f"<@{candidate['first_person']}> ({candidate['first_person']})", inline=False)
+                embed = discord.Embed(title="Candidate info", description=f"{user} is running for santa", color=0x00ff00)
+                embed.add_field(name="head elf", value=f"<@{candidate['first_person']}> ({candidate['first_person']})", inline=False)
                 embed.add_field(name="speech", value=candidate['speech'], inline=False)
                 embeds.append(embed)
 
@@ -72,14 +72,13 @@ class Moderation(commands.Cog):
                 await message.delete()
                 return
             if r.emoji == "✅":
-                await con.execute("INSERT INTO presidents (uid, date) VALUES ($1, $2)", winner, datetime.datetime.utcnow())
                 await con.execute("DELETE FROM candidates")
                 await con.execute("DELETE FROM votes")
                 c = await self.bot.fetch_channel(self.bot.channel)
                 m = await ctx.guild.fetch_member(winner)
                 r = ctx.guild.get_role(self.bot.role)
                 await m.add_roles(r)
-                await c.send(f"<@{winner}> has been elected president with {round(votecount[winner] / total * 100, 2)}% of the votes")
+                await c.send(f"<@{winner}> has been elected santa with {round(votecount[winner] / total * 100, 2)}% of the votes")
             elif r.emoji == "❌":
                 await ctx.reply("Tally cancelled", mention_author=False)
                 return

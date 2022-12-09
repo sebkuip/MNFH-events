@@ -47,36 +47,36 @@ class Elections(commands.Cog):
                         return
                 channel = await self.bot.fetch_channel(self.bot.channel)
                 candidate = await self.bot.fetch_user(data["uid"])
-                embed = discord.Embed(title=str(candidate), description=f"You can now vote on this candidate.")
-                embed.add_field(name="First lady/gentelman/gentelperson", value="<@" + str(data["first_person"]) + ">", inline=False)
+                embed = discord.Embed(title=str(candidate), description=f"You can now vote on this santa.")
+                embed.add_field(name="head elf", value="<@" + str(data["first_person"]) + ">", inline=False)
                 embed.add_field(name="Speech", value=data["speech"], inline=False)
                 await channel.send(f"<@{data['uid']}> is running during this election", embed=embed)
 
-    @commands.command(help="Run for office")
+    @commands.command(help="Run for santa")
     async def run(self, ctx):
         async with self.bot.pool.acquire() as con:
             check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", ctx.author.id)
             if check1:
                 try:
-                    await ctx.author.send("You are already running for office.")
+                    await ctx.author.send("You are already running for santa.")
                 except discord.Forbidden:
-                    await ctx.reply("You are already running for office.", delete_after=10)
+                    await ctx.reply("You are already running for santa.", delete_after=10)
                 finally:
                     return
 
             check2 = await con.fetchrow("SELECT uid FROM candidates WHERE first_person = $1", ctx.author.id)
             if check2:
                 try:
-                    await ctx.author.send("You are selected as a first lady/gentelman/gentelperson and thus cannot vote.")
+                    await ctx.author.send("You are selected as a head elf and thus cannot run for santa.")
                 except discord.Forbidden:
-                    await ctx.reply("You are selected as a first lady/gentelman/gentelperson and thus cannot vote.", delete_after=10)
+                    await ctx.reply("You are selected as a head elf and thus cannot run for santa.", delete_after=10)
                 finally:
                     return
 
             def check(m):
                 return m.author == ctx.author and m.guild is None
             try:
-                await ctx.author.send("Who is your first lady/gentlman/gentelperson. Please respond with their userID or mention. Type cancel to cancel")
+                await ctx.author.send("Who is your head elf. Please respond with their userID or mention. Type cancel to cancel")
             except discord.Forbidden:
                 await ctx.reply("I need to be able to DM you to ask you a few questions. Please turn on your DMs in your settings.")
                 return
@@ -89,7 +89,7 @@ class Elections(commands.Cog):
                     try:
                         first_person: discord.Member = await commands.MemberConverter().convert(ctx, msg.content)
                         if first_person == ctx.author:
-                            await ctx.author.send("You cannot be your own first lady/gentlman/gentelperson.")
+                            await ctx.author.send("You cannot be your own head elf.")
                             continue
                     except commands.BadArgument:
                         await ctx.author.send("That is not a valid userID or mention")
@@ -115,7 +115,7 @@ class Elections(commands.Cog):
                 return
 
             embed = discord.Embed(title="Your application", description="Please check your application. React with ✅ to confirm or ❌ to cancel")
-            embed.add_field(name="First lady", value=str(first_person), inline=False)
+            embed.add_field(name="Head elf", value=str(first_person), inline=False)
             embed.add_field(name="Speech", value=speech.content, inline=False)
             embed.set_footer(text="This application will be reviewed by the moderation team after submitting")
 
@@ -156,7 +156,7 @@ class Elections(commands.Cog):
             check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
             if not check1:
                 try:
-                    await ctx.author.send("That user is not running for office.")
+                    await ctx.author.send("That user is not running for santa.")
                 finally:
                     return
 
@@ -170,7 +170,7 @@ class Elections(commands.Cog):
             check3 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", ctx.author.id)
             if check3:
                 try:
-                    await ctx.author.send("You are running for office and can't vote.")
+                    await ctx.author.send("You are running for santa and can't vote.")
                 finally:
                     return
 
@@ -187,7 +187,7 @@ class Elections(commands.Cog):
             check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
             if not check1:
                 try:
-                    await ctx.author.send("That user is not running for office.")
+                    await ctx.author.send("That user is not running for santa.")
                 finally:
                     return
 

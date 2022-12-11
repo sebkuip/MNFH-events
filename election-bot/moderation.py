@@ -138,6 +138,20 @@ class Moderation(commands.Cog):
             else:
                 await ctx.reply("Vote not found", mention_author=False)
 
+    @commands.command(help="Add or remove extra votes from a candidate")
+    @commands.has_permissions(manage_messages=True)
+    async def add(self, ctx, candidate: discord.User, amount: int):
+        async with self.bot.pool.acquire() as con:
+            check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
+            if not check1:
+                try:
+                    await ctx.author.send("That user is not running for santa.")
+                finally:
+                    return
+
+            await con.execute("UPDATE candidates SET misc_votes = misc_votes + $1 WHERE uid = $2", amount, candidate.id)
+            await ctx.reply(f"Added {amount} votes to {candidate}", mention_author=False)
+
 
 async def setup(bot):
     await bot.add_cog(Moderation(bot))

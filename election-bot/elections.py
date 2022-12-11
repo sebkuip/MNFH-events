@@ -149,11 +149,12 @@ class Elections(commands.Cog):
                     await ctx.author.send("Cancelled")
                     return
 
-    @commands.group(help="Vote on a candidate. You may only vote once per election.", invoke_without_command=True)
+    @commands.command(help="Vote on a candidate. You may only vote once per election.")
     async def vote(self, ctx, candidate: discord.User):
         await ctx.message.delete()
         async with self.bot.pool.acquire() as con:
             check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
+            print(check1)
             if not check1:
                 try:
                     await ctx.author.send("That user is not running for santa.")
@@ -161,6 +162,7 @@ class Elections(commands.Cog):
                     return
 
             check2 = await con.fetchrow("SELECT uid FROM votes WHERE uid = $1", ctx.author.id)
+            print(check2)
             if check2:
                 try:
                     await ctx.author.send("You have already voted.")
@@ -168,6 +170,7 @@ class Elections(commands.Cog):
                     return
 
             check3 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", ctx.author.id)
+            print(check3)
             if check3:
                 try:
                     await ctx.author.send("You are running for santa and can't vote.")
@@ -179,20 +182,6 @@ class Elections(commands.Cog):
                 await ctx.author.send("You have voted for " + str(candidate))
             except discord.Forbidden:
                 await ctx.reply("You have voted for " + str(candidate), delete_after=20)
-
-    @vote.command(help="Add or remove extra votes from a candidate")
-    @commands.has_permissions(manage_messages=True)
-    async def add(self, ctx, candidate: discord.User, amount: int):
-        async with self.bot.pool.acquire() as con:
-            check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
-            if not check1:
-                try:
-                    await ctx.author.send("That user is not running for santa.")
-                finally:
-                    return
-
-            await con.execute("UPDATE candidates SET misc_votes = misc_votes + $1 WHERE uid = $2", amount, candidate.id)
-            await ctx.reply(f"Added {amount} votes to {candidate}", mention_author=False)
 
 async def setup(bot):
     await bot.add_cog(Elections(bot))

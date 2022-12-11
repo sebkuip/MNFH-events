@@ -62,6 +62,11 @@ class ErrorHandler(commands.Cog):
                 name=f"**BotMissingPermissions**",
                 value=f"Looks like the bot is missing permissions to execute this command.",
             )
+        elif isinstance(error, commands.DisabledCommand):
+            embed.add_field(
+                name=f"**DisabledCommand**",
+                value=f"Looks like the command you tried to execute is disabled.",
+            )
         # elif isinstance(error, discord.Forbidden):
         #     embed.add_field(
         #         name=f"**Forbidden**",

@@ -149,7 +149,7 @@ class Elections(commands.Cog):
                     await ctx.author.send("Cancelled")
                     return
 
-    @commands.command(help="Vote on a candidate. You may only vote once per election.")
+    @commands.command(help="Vote on a candidate. You may only vote once per election.", enabled=False)
     async def vote(self, ctx, candidate: discord.User):
         await ctx.message.delete()
         async with self.bot.pool.acquire() as con:

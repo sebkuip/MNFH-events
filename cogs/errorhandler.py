@@ -62,10 +62,11 @@ class ErrorHandler(commands.Cog):
                 name=f"**BotMissingPermissions**",
                 value=f"Looks like the bot is missing permissions to execute this command.",
             )
-        elif isinstance(error, discord.Forbidden):
-            return
-        elif isinstance(error, commands.UnexpectedQuoteError):
-            return
+        # elif isinstance(error, discord.Forbidden):
+        #     embed.add_field(
+        #         name=f"**Forbidden**",
+        #         value=f"Looks like the bot is missing permissions to execute this command.",
+        #     )
         # elif isinstance(error, discord.ext.commands.errors.CommandInvokeError):
         # embed.add_field(name=f'**CommandInvokeError**',
         # value=f'Looks like something is wrong with the command. This could be because the page '

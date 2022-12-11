@@ -154,7 +154,6 @@ class Elections(commands.Cog):
         await ctx.message.delete()
         async with self.bot.pool.acquire() as con:
             check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
-            print(check1)
             if not check1:
                 try:
                     await ctx.author.send("That user is not running for santa.")
@@ -162,7 +161,6 @@ class Elections(commands.Cog):
                     return
 
             check2 = await con.fetchrow("SELECT uid FROM votes WHERE uid = $1", ctx.author.id)
-            print(check2)
             if check2:
                 try:
                     await ctx.author.send("You have already voted.")
@@ -170,7 +168,6 @@ class Elections(commands.Cog):
                     return
 
             check3 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", ctx.author.id)
-            print(check3)
             if check3:
                 try:
                     await ctx.author.send("You are running for santa and can't vote.")

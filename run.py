@@ -19,6 +19,7 @@ class MyBot(commands.Bot):
 bot = MyBot()
 bot.staff_channel = getenv("STAFF_CHANNEL")
 bot.role = getenv("ROLE")
+bot.channel = getenv("CHANNEL")
 
 @bot.event
 async def on_ready():

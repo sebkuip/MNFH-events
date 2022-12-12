@@ -45,7 +45,7 @@ class Elections(commands.Cog):
                         await member.send("Your application has been accepted. You can now ask people to vote for you.")
                     except discord.Forbidden:
                         return
-                channel = self.bot.get_guild(pyaload.guild_id).get_channel(self.bot.channel)
+                channel = self.bot.get_guild(payload.guild_id).get_channel(self.bot.channel)
                 candidate = await self.bot.fetch_user(data["uid"])
                 embed = discord.Embed(title=str(candidate), description=f"You can now vote on this santa.")
                 embed.add_field(name="head elf", value="<@" + str(data["first_person"]) + ">", inline=False)

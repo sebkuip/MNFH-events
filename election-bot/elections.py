@@ -152,7 +152,6 @@ class Elections(commands.Cog):
     @commands.command(help="Vote on a candidate. You may only vote once per election.")
     @commands.dm_only()
     async def vote(self, ctx, candidate: discord.User):
-        await ctx.message.delete()
         async with self.bot.pool.acquire() as con:
             check1 = await con.fetchrow("SELECT uid FROM candidates WHERE uid = $1", candidate.id)
             if not check1:

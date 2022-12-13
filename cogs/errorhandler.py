@@ -67,6 +67,11 @@ class ErrorHandler(commands.Cog):
                 name=f"**DisabledCommand**",
                 value=f"Looks like the command you tried to execute is disabled.",
             )
+        elif isinstance(error, commands.PrivateMessageOnly):
+            embed.add_field(
+                name=f"**PrivateMessageOnly**",
+                value=f"Looks like the command you tried to execute is only available in DMs.",
+            )
         # elif isinstance(error, discord.Forbidden):
         #     embed.add_field(
         #         name=f"**Forbidden**",
